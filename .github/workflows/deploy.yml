@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  deploy-backend-render:
+    name: Deploy backend (Render hook)
+    runs-on: ubuntu-latest
+    if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL != '' }}
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          curl -fsSL -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}"
+
+  deploy-frontend:
+    name: Deploy frontend (placeholder)
+    runs-on: ubuntu-latest
+    if: ${{ false }}
+    steps:
+      - name: Placeholder
+        run: echo "Configure a frontend deploy (Vercel/Netlify) here."
