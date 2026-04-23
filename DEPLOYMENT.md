@@ -15,9 +15,11 @@ This guide covers deploying FashionWear with **Vercel (frontend)** and **Render 
 ## Step 1: MongoDB Atlas Setup
 
 1. Create a cluster at [MongoDB Atlas](https://cloud.mongodb.com)
-2. Create a database user with read/write permissions
-3. Whitelist IP `0.0.0.0/0` (or your Render/Vercel IPs)
-4. Copy connection string: `mongodb+srv://user:pass@cluster.mongodb.net/fashionwear`
+2. Create a DB user, whitelist your IP
+3. Copy the connection string:
+   ```bash
+   MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/fashionwear
+   ```
 
 ---
 
@@ -31,14 +33,13 @@ This guide covers deploying FashionWear with **Vercel (frontend)** and **Render 
 - **Name**: `fashionwear-backend`
 - **Region**: Your preferred region
 - **Branch**: `main`
-- **Root Directory**: `server`
-
-### 2.3. Configure Build & Start
+- **Root Directory**: `server` (IMPORTANT!)
+- **Runtime**: Node.js
 - **Build Command**: `npm install`
 - **Start Command**: `node index.js`
 - **Plan**: Free
 
-### 2.4. Set Environment Variables
+### 2.3. Set Environment Variables
 | Variable | Value | Type |
 |---|---|---|
 | `NODE_ENV` | `production` | Plain |
@@ -54,7 +55,7 @@ This guide covers deploying FashionWear with **Vercel (frontend)** and **Render 
 | `PAYTM_WEBSITE` | `DEFAULT` | Plain |
 | `PAYTM_ENV` | `prod` | Plain |
 
-### 2.5. Deploy
+### 2.4. Deploy
 - Click **Create Web Service**
 - Render will auto-build and deploy
 - Your backend URL: `https://fashionwear-backend.onrender.com`
@@ -133,7 +134,7 @@ Visit: `https://fashionwear-frontend.vercel.app`
 
 ### CORS Issues
 If frontend can't reach backend:
-- Verify `FRONTEND_URL` in backend env matches exactly
+- Verify `FRONTEND_URL` in backend env matches your Vercel URL exactly
 - Check CORS config in `server/index.js` (line 37-40)
 
 ### MongoDB Connection
@@ -153,40 +154,27 @@ If frontend can't reach backend:
 
 ---
 
-## 🔄 CI/CD (Optional)
+## 🚀 Alternative: Deploy Both Services to Render
 
-### Automatic Deploy on Push
+If you prefer to use Render for both frontend and backend:
 
-**Vercel**: Auto-connected to your Git repo → deploys on push to `main`
+### Step 1: Deploy Backend to Render (Web Service)
+1. **Service Type**: Web
+2. **Root Directory**: `server`
+3. **Build Command**: `npm install`
+4. **Start Command**: `node index.js`
+5. Set all backend environment variables
 
-**Render**: 
-- In service settings → "Auto-Deploy" → enable
-- Or add webhook to your Git repo
+### Step 2: Deploy Frontend to Render (Static Site)
+1. **Service Type**: Static Site
+2. **Root Directory**: (leave empty)
+3. **Build Command**: `npm run build`
+4. **Publish Directory**: `dist`
+5. Set `VITE_API_URL` environment variable
 
----
-
-## 📝 Environment Variable Summary
-
-### Backend (Render)
-```env
-NODE_ENV=production
-PORT=5000
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/fashionwear
-JWT_SECRET=your-super-secret-jwt-key-change-this
-FRONTEND_URL=https://fashionwear-frontend.vercel.app
-BACKEND_URL=https://fashionwear-backend.onrender.com
-ADMIN_EMAIL=admin@fashionwear.in
-ADMIN_PASSWORD=your-admin-password
-PAYTM_MID=YOUR_MERCHANT_ID
-PAYTM_MERCHANT_KEY=YOUR_SECRET_KEY
-PAYTM_WEBSITE=DEFAULT
-PAYTM_ENV=prod
-```
-
-### Frontend (Vercel)
-```env
-VITE_API_URL=https://fashionwear-backend.onrender.com/api
-```
+### Step 3: Update URLs
+- Backend: `FRONTEND_URL` → Your Render frontend URL
+- Frontend: `VITE_API_URL` → Your Render backend URL + `/api`
 
 ---
 
