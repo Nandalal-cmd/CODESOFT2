@@ -40,20 +40,20 @@ This guide covers deploying FashionWear with **Vercel (frontend)** and **Render 
 - **Plan**: Free
 
 ### 2.3. Set Environment Variables
-| Variable | Value | Type |
-|---|---|---|
-| `NODE_ENV` | `production` | Plain |
-| `PORT` | `5000` | Plain |
-| `MONGODB_URI` | `mongodb+srv://...` | Secret |
-| `JWT_SECRET` | `your-strong-secret-key` | Secret |
-| `FRONTEND_URL` | `https://your-frontend.vercel.app` | Plain |
-| `BACKEND_URL` | `https://your-backend.onrender.com` | Plain |
-| `ADMIN_EMAIL` | `admin@fashionwear.in` | Plain |
-| `ADMIN_PASSWORD` | `your-admin-password` | Secret |
-| `PAYTM_MID` | `YOUR_MID` | Secret |
-| `PAYTM_MERCHANT_KEY` | `YOUR_KEY` | Secret |
-| `PAYTM_WEBSITE` | `DEFAULT` | Plain |
-| `PAYTM_ENV` | `prod` | Plain |
+| Variable | Value | Type | Required |
+|---|---|---|---|
+| `NODE_ENV` | `production` | Plain | ✅ |
+| `PORT` | `5000` | Plain | ✅ |
+| `MONGODB_URI` | `mongodb+srv://...` | Secret | ✅ |
+| `JWT_SECRET` | `your-strong-secret-key` | Secret | ✅ |
+| `FRONTEND_URL` | `https://your-frontend.vercel.app` | Plain | ✅ |
+| `BACKEND_URL` | `https://your-backend.onrender.com` | Plain | ✅ |
+| `ADMIN_EMAIL` | `admin@fashionwear.in` | Plain | ✅ |
+| `ADMIN_PASSWORD` | `your-admin-password` | Secret | ✅ |
+| `PAYTM_MID` | `YOUR_MID` | Secret | ❌ (optional) |
+| `PAYTM_MERCHANT_KEY` | `YOUR_KEY` | Secret | ❌ (optional) |
+| `PAYTM_WEBSITE` | `DEFAULT` | Plain | ❌ (optional) |
+| `PAYTM_ENV` | `prod` | Plain | ❌ (optional) |
 
 ### 2.4. Deploy
 - Click **Create Web Service**
@@ -111,6 +111,46 @@ BACKEND_URL=https://fashionwear-backend.onrender.com
 ```env
 VITE_API_URL=https://fashionwear-backend.onrender.com/api
 ```
+
+---
+
+## 🚀 Quick Start Deployment (Without Payments)
+
+### Minimal Environment Variables for Render Backend:
+
+**Required Variables:**
+```env
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=mongodb+srv://admin:password@cluster.mongodb.net/fashionwear
+JWT_SECRET=your-super-secret-jwt-key-here
+FRONTEND_URL=https://your-frontend.vercel.app
+BACKEND_URL=https://fashionwear-backend.onrender.com
+ADMIN_EMAIL=admin@fashionwear.in
+ADMIN_PASSWORD=your-admin-password
+```
+
+**Paytm Variables (Optional - Skip for now):**
+```env
+# Skip these for basic deployment - payments will use fallback mode
+PAYTM_MID=YOUR_MID
+PAYTM_MERCHANT_KEY=YOUR_KEY
+PAYTM_WEBSITE=DEFAULT
+PAYTM_ENV=prod
+```
+
+### Frontend Environment (Vercel):
+```env
+VITE_API_URL=https://fashionwear-backend.onrender.com/api
+```
+
+### What works without payments:
+- ✅ User registration/login
+- ✅ Product browsing
+- ✅ Cart functionality
+- ✅ Admin dashboard
+- ✅ Order management (guest orders)
+- ❌ Real payments (will show simulation message)
 
 ---
 

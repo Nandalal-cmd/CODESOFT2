@@ -24,12 +24,16 @@ services:
         sync: false
       - key: PAYTM_MID
         sync: false
+        # Optional - remove if not using payments
       - key: PAYTM_MERCHANT_KEY
         sync: false
+        # Optional - remove if not using payments
       - key: PAYTM_WEBSITE
         value: DEFAULT
+        # Optional - remove if not using payments
       - key: PAYTM_ENV
         value: prod
+        # Optional - remove if not using payments
     autoDeploy: false
 
   - type: web
