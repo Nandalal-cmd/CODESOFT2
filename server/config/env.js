@@ -50,13 +50,23 @@ const env = {
 
 // Validate critical secrets in production
 if (env.NODE_ENV === 'production') {
-  const required = ['JWT_SECRET', 'MONGODB_URI', 'PAYTM_MID', 'PAYTM_MERCHANT_KEY'];
+  const required = ['JWT_SECRET', 'MONGODB_URI'];
   required.forEach(key => {
     if (!process.env[key]) {
       console.error(`  ❌  Missing required env var: ${key}`);
       process.exit(1);
     }
   });
+
+  // Paytm is optional - provide defaults if not set
+  if (!process.env.PAYTM_MID) {
+    console.log('  ⚠️  PAYTM_MID not set - using demo mode');
+    env.PAYTM.MID = 'DEMO_MID';
+  }
+  if (!process.env.PAYTM_MERCHANT_KEY) {
+    console.log('  ⚠️  PAYTM_MERCHANT_KEY not set - using demo mode');
+    env.PAYTM.KEY = 'DEMO_KEY';
+  }
 }
 
 // Export flat for convenience
