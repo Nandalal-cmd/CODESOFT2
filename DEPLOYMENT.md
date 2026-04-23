@@ -14,11 +14,38 @@ This guide covers deploying FashionWear with **Vercel (frontend)** and **Render 
 
 ## Step 1: MongoDB Atlas Setup
 
-1. Create a cluster at [MongoDB Atlas](https://cloud.mongodb.com)
-2. Create a DB user, whitelist your IP
-3. Copy the connection string:
-   ```bash
-   MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/fashionwear
+1. **Create Account**: Go to [MongoDB Atlas](https://cloud.mongodb.com) → Sign Up (free)
+2. **Create Cluster**: Choose "Free" tier → Create Cluster (takes 3-5 minutes)
+3. **Create Database User**:
+   - Go to "Database Access" (left menu)
+   - Click "Add New Database User"
+   - Choose "Password" authentication
+   - Username: `admin` (or your choice)
+   - Password: `YourStrongPassword123` (save this!)
+   - Click "Add User"
+
+4. **Whitelist IP Address**:
+   - Go to "Network Access" (left menu)
+   - Click "Add IP Address"
+   - Choose "Allow Access from Anywhere" → `0.0.0.0/0`
+   - Click "Confirm"
+
+5. **Get Connection String**:
+   - Go to "Clusters" → Click "Connect"
+   - Choose "Connect your application"
+   - Driver: "Node.js", Version: "3.6 or later"
+   - **Copy the connection string**
+   - Replace `<password>` with your actual password
+   - Replace `<dbname>` with `fashionwear`
+
+   **Example:**
+   ```
+   mongodb+srv://admin:YourStrongPassword123@cluster0.abcde.mongodb.net/fashionwear?retryWrites=true&w=majority
+   ```
+
+   **Your MONGODB_URI should look like:**
+   ```
+   MONGODB_URI=mongodb+srv://admin:YourStrongPassword123@cluster0.abcde.mongodb.net/fashionwear?retryWrites=true&w=majority
    ```
 
 ---
