@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: fashionwear-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: FRONTEND_URL
+        value: https://fashionwear-frontend.onrender.com
+      - key: BACKEND_URL
+        value: https://fashionwear-backend.onrender.com
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PAYTM_MID
+        sync: false
+      - key: PAYTM_MERCHANT_KEY
+        sync: false
+      - key: PAYTM_WEBSITE
+        value: DEFAULT
+      - key: PAYTM_ENV
+        value: prod
+    autoDeploy: false
+
+  - type: web
+    name: fashionwear-frontend
+    env: static
+    plan: free
+    buildCommand: npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://fashionwear-backend.onrender.com/api
+    autoDeploy: false

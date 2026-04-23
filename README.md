@@ -67,6 +67,18 @@ cd server
 npm install        # Backend dependencies
 ```
 
+### 🌍 Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment guide:
+- **Frontend**: Deploy to Vercel
+- **Backend**: Deploy to Render
+- **Database**: MongoDB Atlas
+
+Configuration files included:
+- `vercel.json` — Vercel frontend config
+- `render.yaml` — Render backend + frontend services
+- `Procfile` — Alternative for platform-specific deployments
+
 ### 2. Configure Backend
 
 ```bash
