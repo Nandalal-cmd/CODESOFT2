@@ -67,6 +67,7 @@ export const orderApi = {
   create:       (data)        => api.post('/orders', data),
   myOrders:     ()            => api.get('/orders/my'),
   get:          (orderId)     => api.get(`/orders/${orderId}`),
+  track:        (orderId, email) => api.get(`/orders/track/${orderId}`, { params: { email } }),
   // Admin
   list:         (params)      => api.get('/orders', { params }),
   updateStatus: (orderId, data) => api.patch(`/orders/${orderId}/status`, data),

@@ -3,7 +3,7 @@ import { PRODUCTS, OFFERS, CATEGORIES, TYPES } from '../data/products';
 import { ProductCard, ProductModal } from '../components/ProductCard';
 import { useApp } from '../context/AppContext';
 
-export default function HomePage({ searchQuery, onViewDetails }) {
+export default function HomePage({ searchQuery, onViewDetails, onNavigate }) {
   const { recentlyViewed, addToCart } = useApp();
   const [selProd, setSelProd] = useState(null);
   const [filt, setFilt] = useState({ cat: 'All', type: 'All', maxP: 9999, sort: 'popular' });
@@ -229,16 +229,17 @@ export default function HomePage({ searchQuery, onViewDetails }) {
             </div>
           </div>
           {[
-            { title: 'Shop', links: ['New Arrivals','Men\'s Collection','Women\'s Collection','Accessories','Sale'] },
-            { title: 'Help', links: ['Size Guide','Free Returns','Track Order','Contact Us','FAQ'] },
-            { title: 'Company', links: ['About Us','Careers','Press','Sustainability','Stores'] },
+            { title: 'Shop', links: [{ label: 'New Arrivals', action: null }, { label: 'Men\'s Collection', action: 'men' }, { label: 'Women\'s Collection', action: 'women' }, { label: 'Accessories', action: null }, { label: 'Sale', action: 'sale' }] },
+            { title: 'Help', links: [{ label: 'Size Guide', action: null }, { label: 'Free Returns', action: null }, { label: 'Track Order', action: 'track' }, { label: 'Contact Us', action: null }, { label: 'FAQ', action: null }] },
+            { title: 'Company', links: [{ label: 'About Us', action: null }, { label: 'Careers', action: null }, { label: 'Press', action: null }, { label: 'Sustainability', action: null }, { label: 'Stores', action: null }] },
           ].map(col => (
             <div key={col.title}>
               <div style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--text2)', marginBottom: 14 }}>{col.title}</div>
               {col.links.map(l => (
-                <div key={l} style={{ fontSize: 14, color: 'var(--text)', marginBottom: 9, cursor: 'pointer', opacity: .7, transition: 'opacity .15s' }}
+                <div key={l.label} onClick={() => l.action && onNavigate?.(l.action)}
+                  style={{ fontSize: 14, color: l.action ? 'var(--gold)' : 'var(--text)', marginBottom: 9, cursor: l.action ? 'pointer' : 'default', opacity: .7, transition: 'opacity .15s' }}
                   onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '.7'}>{l}</div>
+                  onMouseLeave={e => e.currentTarget.style.opacity = '.7'}>{l.label}</div>
               ))}
             </div>
           ))}

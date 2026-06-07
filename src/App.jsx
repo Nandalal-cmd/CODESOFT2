@@ -12,6 +12,7 @@ import {
   WishlistPage,
   OrderHistoryPage,
   ProfilePage,
+  OrderTrackingPage,
 } from './pages/ExtraPages';
 import ProductDescriptionPage from './pages/ProductDescriptionPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -63,10 +64,10 @@ function AppShell() {
       <Navbar onSearch={setSearch} searchVal={search} onNavigate={navigate} currentView={view} onViewDetails={openProductDetails} />
 
       {/* Store views */}
-      {view === 'home'    && <HomePage searchQuery={search} onViewDetails={openProductDetails} />}
-      {view === 'men'     && <HomePage searchQuery={search} defaultCat="Men"    onViewDetails={openProductDetails} />}
-      {view === 'women'   && <HomePage searchQuery={search} defaultCat="Women"  onViewDetails={openProductDetails} />}
-      {view === 'sale'    && <HomePage searchQuery={search} defaultBadge="SALE" onViewDetails={openProductDetails} />}
+      {view === 'home'    && <HomePage searchQuery={search} onViewDetails={openProductDetails} onNavigate={navigate} />}
+      {view === 'men'     && <HomePage searchQuery={search} defaultCat="Men"    onViewDetails={openProductDetails} onNavigate={navigate} />}
+      {view === 'women'   && <HomePage searchQuery={search} defaultCat="Women"  onViewDetails={openProductDetails} onNavigate={navigate} />}
+      {view === 'sale'    && <HomePage searchQuery={search} defaultBadge="SALE" onViewDetails={openProductDetails} onNavigate={navigate} />}
 
       {view === 'product' && (
         <ProductDescriptionPage
@@ -111,6 +112,10 @@ function AppShell() {
 
       {view === 'profile' && (
         <ProfilePage onBack={() => setView('home')} />
+      )}
+
+      {view === 'track' && (
+        <OrderTrackingPage onBack={() => setView('home')} />
       )}
 
       <CartSidebar onCheckout={() => navigate('checkout')} />

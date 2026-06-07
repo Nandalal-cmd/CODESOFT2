@@ -144,7 +144,19 @@ async function updatePaymentStatus(req, res) {
   res.json({ success: true, order });
 }
 
+/** GET /api/orders/track/:orderId — guest tracking by order ID + email */
+async function trackOrder(req, res) {
+  const { email } = req.query;
+  const order = await Order.findOne({ orderId: req.params.orderId }).lean();
+  if (!order) throw createError(404, 'Order not found');
+  if (email && order.email?.toLowerCase() !== email.toLowerCase()) {
+    throw createError(403, 'Email does not match this order');
+  }
+  res.json({ order });
+}
+
 module.exports = {
   createOrder, getMyOrders, getOrder,
   listOrders, updateOrderStatus, updatePaymentStatus,
+  trackOrder,
 };

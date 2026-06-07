@@ -279,6 +279,132 @@ export function WishlistPage({ onBack, onViewDetails }) {
 }
 
 /* ════════════════════════════════════════
+   Order Tracking Page (Guest)
+════════════════════════════════════════ */
+export function OrderTrackingPage({ onBack }) {
+  const [orderId, setOrderId] = useState('');
+  const [email, setEmail] = useState('');
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleTrack = async (e) => {
+    e.preventDefault();
+    if (!orderId.trim()) { setError('Enter an order ID'); return; }
+    setLoading(true);
+    setError('');
+    setOrder(null);
+    try {
+      const { orderApi } = await import('../utils/api');
+      const res = await orderApi.track(orderId.trim(), email.trim());
+      setOrder(res.data.order);
+    } catch (err) {
+      const msg = err.response?.data?.error || 'Order not found. Check your Order ID and email.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const ST_COLORS = {
+    pending: { bg: 'rgba(201,164,85,.12)', color: '#c9a455' },
+    processing: { bg: 'rgba(82,136,224,.12)', color: '#5288e0' },
+    shipped: { bg: 'rgba(157,100,220,.12)', color: '#9d64dc' },
+    delivered: { bg: 'rgba(82,168,105,.12)', color: '#52a869' },
+    cancelled: { bg: 'rgba(220,80,80,.12)', color: '#dc5050' },
+    payment_failed: { bg: 'rgba(220,80,80,.12)', color: '#dc5050' },
+  };
+  const sc = (s) => ST_COLORS[s] || ST_COLORS.pending;
+
+  return (
+    <div style={{ padding: '40px 5%', maxWidth: 640, margin: '0 auto' }}>
+      <button className="btn-ghost" onClick={onBack} style={{ marginBottom: 20 }}>← Back to Shopping</button>
+      <h1 style={{ fontFamily: 'var(--fd)', fontSize: 38, fontWeight: 700, marginBottom: 8 }}>Track Your Order</h1>
+      <p style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 28 }}>Enter your Order ID and email address to see real-time order status.</p>
+
+      {!order ? (
+        <div className="card" style={{ padding: 28 }}>
+          <form onSubmit={handleTrack}>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', fontSize: 11, color: 'var(--text2)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 7 }}>Order ID</label>
+              <input className="inp" value={orderId} onChange={e => setOrderId(e.target.value)} placeholder="e.g. FW3A2B1C..." style={{ width: '100%' }} required />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', fontSize: 11, color: 'var(--text2)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 7 }}>Email Address (optional)</label>
+              <input className="inp" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" style={{ width: '100%' }} />
+            </div>
+            {error && <div style={{ color: 'var(--red)', fontSize: 13, marginBottom: 14 }}>⚠ {error}</div>}
+            <button type="submit" className="btn-gold" style={{ width: '100%', padding: 13 }} disabled={loading}>
+              {loading ? 'Searching…' : '🔍 Track Order'}
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div>
+          {/* Order header */}
+          <div className="card" style={{ padding: 24, marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 11, color: 'var(--text2)', letterSpacing: 1, textTransform: 'uppercase' }}>Order ID</div>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 22, fontWeight: 700 }}>#{order.orderId}</div>
+              </div>
+              <span style={{ padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: .5, textTransform: 'uppercase', background: sc(order.status).bg, color: sc(order.status).color }}>
+                {order.status?.replace('_', ' ')}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, fontSize: 13 }}>
+              <div><span style={{ color: 'var(--text2)' }}>Placed: </span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+              <div><span style={{ color: 'var(--text2)' }}>Total: </span><strong style={{ color: 'var(--gold)' }}>₹{order.total?.toLocaleString()}</strong></div>
+            </div>
+          </div>
+
+          {/* Items */}
+          <div className="card" style={{ padding: 24, marginBottom: 20 }}>
+            <div style={{ fontSize: 11, color: 'var(--text2)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14 }}>Items ({order.items?.length})</div>
+            {(order.items || []).map((item, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: 12, paddingBottom: 12, marginBottom: 12, borderBottom: idx < order.items.length - 1 ? '1px solid var(--bd)' : 'none' }}>
+                {item.imageUrl && <img src={item.imageUrl} alt={item.name} style={{ width: 52, height: 64, objectFit: 'cover', borderRadius: 4 }} />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{item.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>{item.size && `Size: ${item.size}`}{item.size && item.color && ' · '}{item.color && `Color: ${item.color}`}</div>
+                  <div style={{ fontSize: 13, color: 'var(--gold)', marginTop: 4 }}>₹{item.price?.toLocaleString()} × {item.qty}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Timeline */}
+          {order.timeline?.length > 0 && (
+            <div className="card" style={{ padding: 24 }}>
+              <div style={{ fontSize: 11, color: 'var(--text2)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14 }}>Order Timeline</div>
+              <div style={{ position: 'relative', paddingLeft: 20 }}>
+                <div style={{ position: 'absolute', left: 8, top: 8, bottom: 8, width: 2, background: 'var(--bd)' }} />
+                {[...order.timeline].reverse().map((t, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 16, position: 'relative' }}>
+                    <div style={{ width: 14, height: 14, borderRadius: '50%', background: i === 0 ? 'var(--gold)' : 'var(--bd)', border: `3px solid ${i === 0 ? 'var(--gold)' : 'var(--bd)'}`, flexShrink: 0, position: 'relative', left: -6 }} />
+                    <div>
+                      <span style={{ fontWeight: 600, fontSize: 14, textTransform: 'capitalize' }}>{t.status?.replace('_', ' ')}</span>
+                      {t.note && <span style={{ color: 'var(--text2)', fontSize: 13, display: 'block', marginTop: 2 }}>{t.note}</span>}
+                      <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{t.time ? new Date(t.time).toLocaleString('en-IN') : ''}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <button className="btn-ghost" onClick={() => { setOrder(null); setOrderId(''); setEmail(''); }} style={{ fontSize: 13 }}>
+              ← Track Another Order
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════
    Order History Page
 ════════════════════════════════════════ */
 const STATUS_COLORS = {

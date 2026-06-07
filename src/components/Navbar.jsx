@@ -166,6 +166,17 @@ export default function Navbar({ onSearch, searchVal, onNavigate, currentView, o
             </button>
           )}
 
+          {/* Track Order */}
+          <button onClick={() => onNavigate('track')} style={{
+            background: 'none', border: '1px solid var(--bd)', padding: '7px 12px',
+            cursor: 'pointer', color: 'var(--text2)', fontSize: 11, fontFamily: 'var(--fb)',
+            borderRadius: 2, transition: 'border .2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--gold)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--bd)'}>
+            📦 Track
+          </button>
+
           {/* Cart */}
           <button id="nav-cart" onClick={() => setCartOpen(true)} style={{
             position: 'relative', background: 'none',

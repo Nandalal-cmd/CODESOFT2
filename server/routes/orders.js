@@ -21,6 +21,7 @@ const orderLimiter = rateLimit({
 // Customer (optional auth for guest checkout)
 router.post('/',            orderLimiter, optionalAuth, validateOrderCreate, asyncHandler(ctrl.createOrder));
 router.get('/my',           requireAuth,                                     asyncHandler(ctrl.getMyOrders));
+router.get('/track/:orderId',                                                asyncHandler(ctrl.trackOrder));
 router.get('/:orderId',     requireAuth,                                     asyncHandler(ctrl.getOrder));
 
 // Admin
