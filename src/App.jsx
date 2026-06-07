@@ -60,7 +60,7 @@ function AppShell() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Navbar onSearch={setSearch} searchVal={search} onNavigate={navigate} currentView={view} />
+      <Navbar onSearch={setSearch} searchVal={search} onNavigate={navigate} currentView={view} onViewDetails={openProductDetails} />
 
       {/* Store views */}
       {view === 'home'    && <HomePage searchQuery={search} onViewDetails={openProductDetails} />}

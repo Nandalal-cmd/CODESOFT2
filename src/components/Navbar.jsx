@@ -1,9 +1,19 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
+import { PRODUCTS } from '../data/products';
 
-export default function Navbar({ onSearch, searchVal, onNavigate, currentView }) {
+export default function Navbar({ onSearch, searchVal, onNavigate, currentView, onViewDetails }) {
   const { cartCount, user, logout, setCartOpen, theme, toggleTheme } = useApp();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const suggestions = useMemo(() => {
+    if (!searchVal?.trim()) return [];
+    const q = searchVal.toLowerCase();
+    return PRODUCTS
+      .filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q) || p.type.toLowerCase().includes(q))
+      .slice(0, 6);
+  }, [searchVal]);
 
   return (
     <nav style={{
@@ -42,9 +52,39 @@ export default function Navbar({ onSearch, searchVal, onNavigate, currentView })
           </button>
 
           <div style={{ position: 'relative' }}>
-            <input className="inp" value={searchVal} onChange={e => onSearch(e.target.value)}
+            <input className="inp" value={searchVal}
+              onChange={e => { onSearch(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               placeholder="Search..." style={{ width: 200, padding: '7px 12px 7px 32px', fontSize: 12 }} />
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 12, pointerEvents: 'none', color: 'var(--text3)' }}>🔍</span>
+            {showSuggestions && suggestions.length > 0 && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 999,
+                background: 'var(--bg2)', border: '1px solid var(--bd)',
+                borderRadius: 'var(--r)', overflow: 'hidden',
+                boxShadow: '0 8px 32px rgba(0,0,0,.2)', marginTop: 4,
+              }}>
+                {suggestions.map(p => (
+                  <div key={p.id} onMouseDown={() => { onSearch(''); onViewDetails?.(p); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 14px', cursor: 'pointer', fontSize: 13,
+                      borderBottom: '1px solid var(--bd)',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg3)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <img src={p.img} alt={p.name}
+                      style={{ width: 36, height: 44, objectFit: 'cover', borderRadius: 2 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600 }}>{p.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text2)' }}>{p.cat} · ₹{p.price.toLocaleString()}</div>
+                    </div>
+                    <span style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* User menu */}
