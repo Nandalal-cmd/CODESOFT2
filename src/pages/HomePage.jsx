@@ -1,8 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { PRODUCTS, OFFERS, CATEGORIES, TYPES } from '../data/products';
 import { ProductCard, ProductModal } from '../components/ProductCard';
+import { useApp } from '../context/AppContext';
 
 export default function HomePage({ searchQuery, onViewDetails }) {
+  const { recentlyViewed, addToCart } = useApp();
   const [selProd, setSelProd] = useState(null);
   const [filt, setFilt] = useState({ cat: 'All', type: 'All', maxP: 9999, sort: 'popular' });
   const [offerIdx, setOfferIdx] = useState(0);
@@ -180,6 +182,35 @@ export default function HomePage({ searchQuery, onViewDetails }) {
           </div>
         )}
       </div>
+
+      {/* ── Recently Viewed ── */}
+      {recentlyViewed.length > 0 && (
+        <div style={{ padding: '30px 5%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h2 style={{ fontFamily: 'var(--fd)', fontSize: 24, fontWeight: 700 }}>Recently Viewed</h2>
+            <span style={{ fontSize: 12, color: 'var(--text2)' }}>Your browsing history</span>
+          </div>
+          <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
+            {recentlyViewed.map(p => (
+              <div key={p.id} className="card" style={{ minWidth: 180, flexShrink: 0, overflow: 'hidden', cursor: 'pointer' }}
+                onClick={() => onViewDetails?.(PRODUCTS.find(x => x.id === p.id))}>
+                <img src={p.img} alt={p.name} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
+                <div style={{ padding: 12 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 8 }}>{p.cat}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontFamily: 'var(--fd)', fontSize: 18, fontWeight: 700, color: 'var(--gold)' }}>₹{p.price?.toLocaleString()}</span>
+                    <button className="btn-gold" style={{ padding: '6px 10px', fontSize: 10 }}
+                      onClick={(e) => { e.stopPropagation(); const pp = PRODUCTS.find(x => x.id === p.id); if (pp) addToCart(pp, pp.sizes[0], pp.colors[0]); }}>
+                      + Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Footer ── */}
       <footer style={{ borderTop: '1px solid var(--bd)', background: 'var(--bg2)', padding: '40px 5% 28px' }}>

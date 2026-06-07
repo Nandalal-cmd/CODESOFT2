@@ -4,7 +4,7 @@ import { Stars } from '../components/UI';
 import { PRODUCTS } from '../data/products';
 
 export default function ProductDescriptionPage({ product, onBack, onViewDetails }) {
-  const { addToCart, toggleWishlist, wishlist, reviews, addReview } = useApp();
+  const { addToCart, toggleWishlist, wishlist, reviews, addReview, trackProductView } = useApp();
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
   const productReviews = useMemo(() => reviews.filter(r => r.productId === product?.id), [reviews, product?.id]);
@@ -36,6 +36,8 @@ export default function ProductDescriptionPage({ product, onBack, onViewDetails 
       })
       .slice(0, 4);
   }, [product]);
+
+  useEffect(() => { if (product) trackProductView(product); }, [product]);
 
   if (!product) return null;
 

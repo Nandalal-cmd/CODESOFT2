@@ -50,6 +50,11 @@ export function AppProvider({ children }) {
     try { return JSON.parse(localStorage.getItem('fashionwear_reviews') || '[]'); } catch { return []; }
   });
 
+  // Recently Viewed — persisted to localStorage
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('fashionwear_recent') || '[]'); } catch { return []; }
+  });
+
   // UI state
   const [toast, setToast]       = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -82,6 +87,10 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('fashionwear_reviews', JSON.stringify(reviews));
   }, [reviews]);
+
+  useEffect(() => {
+    localStorage.setItem('fashionwear_recent', JSON.stringify(recentlyViewed));
+  }, [recentlyViewed]);
 
   // ── Theme ──
   useEffect(() => {
@@ -121,6 +130,15 @@ export function AppProvider({ children }) {
   // ── Wishlist ──
   const toggleWishlist = useCallback(id => {
     setWishlist(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }, []);
+
+  // ── Recently Viewed ──
+  const trackProductView = useCallback((product) => {
+    if (!product?.id) return;
+    setRecentlyViewed(prev => {
+      const filtered = prev.filter(p => p.id !== product.id);
+      return [{ id: product.id, name: product.name, price: product.price, img: product.img, cat: product.cat }, ...filtered].slice(0, 8);
+    });
   }, []);
 
   // ── Reviews ──
@@ -298,6 +316,9 @@ export function AppProvider({ children }) {
 
       // Reviews
       reviews, addReview,
+
+      // Recently Viewed
+      recentlyViewed, trackProductView,
 
       // Coupon
       couponCode, setCouponCode, applyCoupon, setAppliedCoupon,
