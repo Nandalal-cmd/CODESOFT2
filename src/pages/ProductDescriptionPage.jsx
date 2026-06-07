@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Stars } from '../components/UI';
 import { PRODUCTS } from '../data/products';
@@ -10,6 +10,15 @@ export default function ProductDescriptionPage({ product, onBack, onViewDetails 
   const productReviews = useMemo(() => reviews.filter(r => r.productId === product?.id), [reviews, product?.id]);
   const [size, setSize] = useState(product?.sizes?.[0]);
   const [color, setColor] = useState(product?.colors?.[0]);
+  const imgRef = useRef(null);
+  const [zoom, setZoom] = useState({ show: false, x: 50, y: 50 });
+  const handleMouseMove = (e) => {
+    const rect = imgRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoom({ show: true, x, y });
+  };
   const isWishlisted = wishlist.includes(product?.id);
 
   const discountPercent = useMemo(() => {
@@ -37,13 +46,23 @@ export default function ProductDescriptionPage({ product, onBack, onViewDetails 
       </button>
 
       <div className="card" style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 460px) 1fr', gap: 30, padding: 24 }}>
-        <div>
+        <div style={{ position: 'relative' }}>
           {product.badge && <span className={`badge badge-${product.badge}`} style={{ position: 'relative', top: 0, left: 0 }}>{product.badge}</span>}
-          <img
-            src={product.img}
-            alt={product.name}
-            style={{ width: '100%', borderRadius: 'var(--r)', border: '1px solid var(--bd)', marginTop: 12 }}
-          />
+          <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--r)', marginTop: 12, cursor: 'crosshair' }}
+            ref={imgRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setZoom(s => ({ ...s, show: false }))}>
+            <img src={product.img} alt={product.name}
+              style={{ width: '100%', display: 'block', border: '1px solid var(--bd)', borderRadius: 'var(--r)' }} />
+            {zoom.show && (
+              <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
+                backgroundImage: `url(${product.img})`,
+                backgroundSize: '200%',
+                backgroundPosition: `${zoom.x}% ${zoom.y}%`,
+              }} />
+            )}
+          </div>
         </div>
 
         <div>
