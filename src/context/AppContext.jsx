@@ -45,6 +45,11 @@ export function AppProvider({ children }) {
     try { return JSON.parse(localStorage.getItem('fashionwear_wishlist') || '[]'); } catch { return []; }
   });
 
+  // Reviews — persisted to localStorage
+  const [reviews, setReviews] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('fashionwear_reviews') || '[]'); } catch { return []; }
+  });
+
   // UI state
   const [toast, setToast]       = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -73,6 +78,10 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('fashionwear_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('fashionwear_reviews', JSON.stringify(reviews));
+  }, [reviews]);
 
   // ── Theme ──
   useEffect(() => {
@@ -113,6 +122,20 @@ export function AppProvider({ children }) {
   const toggleWishlist = useCallback(id => {
     setWishlist(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   }, []);
+
+  // ── Reviews ──
+  const addReview = useCallback((productId, rating, text) => {
+    const review = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      productId,
+      rating,
+      text,
+      name: user?.name || 'Guest',
+      date: new Date().toISOString(),
+    };
+    setReviews(prev => [review, ...prev]);
+    showToast('Review submitted! Thank you.');
+  }, [user, showToast]);
 
   // ── Auth — Real API ──────────────────────────────────────
   const login = useCallback(async (email, password) => {
@@ -272,6 +295,9 @@ export function AppProvider({ children }) {
 
       // Wishlist
       wishlist, toggleWishlist,
+
+      // Reviews
+      reviews, addReview,
 
       // Coupon
       couponCode, setCouponCode, applyCoupon, setAppliedCoupon,

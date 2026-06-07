@@ -4,7 +4,10 @@ import { Stars } from '../components/UI';
 import { PRODUCTS } from '../data/products';
 
 export default function ProductDescriptionPage({ product, onBack, onViewDetails }) {
-  const { addToCart, toggleWishlist, wishlist } = useApp();
+  const { addToCart, toggleWishlist, wishlist, reviews, addReview } = useApp();
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const productReviews = useMemo(() => reviews.filter(r => r.productId === product?.id), [reviews, product?.id]);
   const [size, setSize] = useState(product?.sizes?.[0]);
   const [color, setColor] = useState(product?.colors?.[0]);
   const isWishlisted = wishlist.includes(product?.id);
@@ -128,6 +131,64 @@ export default function ProductDescriptionPage({ product, onBack, onViewDetails 
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── Reviews Section ── */}
+      <div className="card" style={{ marginTop: 30, padding: 24 }}>
+        <h2 style={{ fontSize: 32, marginBottom: 20 }}>Customer Reviews ({productReviews.length})</h2>
+
+        {/* Review Form */}
+        <div style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', padding: 20, borderRadius: 'var(--r)', marginBottom: 24 }}>
+          <div style={{ fontSize: 11, color: 'var(--text2)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>Write a Review</div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+            {[1,2,3,4,5].map(s => (
+              <span key={s} onClick={() => setReviewRating(s)} style={{
+                fontSize: 28, cursor: 'pointer', color: s <= reviewRating ? 'var(--gold)' : 'var(--bd)',
+                transition: 'color .15s', userSelect: 'none',
+              }}>{s <= reviewRating ? '★' : '☆'}</span>
+            ))}
+          </div>
+          <textarea className="inp" placeholder="Share your experience with this product..." value={reviewText}
+            onChange={e => setReviewText(e.target.value)} rows={3}
+            style={{ width: '100%', resize: 'vertical', marginBottom: 12, padding: 12, fontSize: 13, fontFamily: 'var(--fb)' }} />
+          <button className="btn-gold" style={{ padding: '10px 24px', fontSize: 12 }}
+            onClick={() => {
+              if (!reviewText.trim()) { return; }
+              addReview(product.id, reviewRating, reviewText.trim());
+              setReviewText('');
+              setReviewRating(5);
+            }}>
+            Submit Review
+          </button>
+        </div>
+
+        {/* Review List */}
+        {productReviews.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text2)' }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+            <div style={{ fontSize: 14 }}>No reviews yet. Be the first to review!</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {productReviews.map(r => (
+              <div key={r.id} style={{ borderBottom: '1px solid var(--bd)', paddingBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--gold)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
+                    {r.name[0]?.toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{r.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text2)' }}>{new Date(r.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}</div>
+                  </div>
+                  <span className="stars" style={{ marginLeft: 'auto' }}>
+                    {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                  </span>
+                </div>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: 'var(--text2)', margin: 0 }}>{r.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: 30 }}>
